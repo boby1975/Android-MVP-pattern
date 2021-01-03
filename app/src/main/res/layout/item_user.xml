@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/user_item_container"
+    android:background="?attr/selectableItemBackground"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/user_item_height">
+
+    <ImageView
+        android:id="@+id/avatar_image_view"
+        android:layout_width="@dimen/user_item_avatar_size"
+        android:layout_height="@dimen/user_item_avatar_size"
+        android:layout_marginStart="@dimen/horizontal_margin"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:visibility="visible"
+        android:id="@+id/avatar_text_view"
+        android:layout_width="@dimen/user_item_avatar_size"
+        android:layout_height="@dimen/user_item_avatar_size"
+        android:background="@drawable/circle_inactive"
+        android:gravity="center"
+        style="@style/TextBigBold"
+        app:layout_constraintBottom_toBottomOf="@+id/avatar_image_view"
+        app:layout_constraintEnd_toEndOf="@+id/avatar_image_view"
+        app:layout_constraintStart_toStartOf="@+id/avatar_image_view"
+        app:layout_constraintTop_toTopOf="@+id/avatar_image_view"
+        tools:text="W" />
+
+    <TextView
+        android:id="@+id/login_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/horizontal_margin"
+        android:layout_marginEnd="@dimen/horizontal_margin"
+        android:ellipsize="end"
+        android:lines="1"
+        style="@style/TextMediumBold"
+        app:layout_constraintStart_toEndOf="@id/avatar_image_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf = "@id/id_text_view"
+        tools:text="login" />
+
+    <TextView
+        android:id="@+id/id_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/horizontal_margin"
+        android:layout_marginEnd="@dimen/horizontal_margin"
+        android:ellipsize="end"
+        android:lines="1"
+        style="@style/TextLight"
+        app:layout_constraintStart_toEndOf="@+id/avatar_image_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/login_text_view"
+        tools:text="id" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/gray"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">BobyMVP</string>
+
+    <string name="text_limit">%d \nLimit</string>
+    <string name="text_remaining">%d \nRemaining</string>
+    <string name="text_used">%d \nUsed</string>
+    <string name="text_stars">%d \nStars</string>
+    <string name="text_watchers">%d \nWatchers</string>
+    <string name="text_forks">%d \nForks</string>
+    <string name="error_loading_repos">Oops, something went wrong</string>
+</resources>
