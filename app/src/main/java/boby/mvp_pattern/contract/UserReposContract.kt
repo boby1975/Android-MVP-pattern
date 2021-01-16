@@ -6,7 +6,7 @@ import boby.mvp_pattern.view.BaseView
 
 interface UserReposContract {
     interface Presenter : BasePresenter<View> {
-        fun onViewCreated(user: String)
+        fun onViewCreated(login: String, userId: Int)
     }
 
     interface View : BaseView<Presenter> {

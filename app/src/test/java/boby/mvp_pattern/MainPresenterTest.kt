@@ -16,6 +16,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
+import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
@@ -32,12 +33,17 @@ class MainPresenterTest {
         User(2, "Peter", "url-2"),
         User(3, "John", "url-3")
     )
+    private val userListNext = listOf(
+        User(4, "Julia", "url-4"),
+        User(5, "Robert", "url-5"),
+        User(6, "Arni", "url-6")
+    )
     private val clickedUser = User(135, "Bobby", "url-135")
-    private val usersRepository = MockUsersRepository(userList)
+    private val usersRepository = MockUsersRepository(userList, userListNext)
 
     private val rate = Rate(100, 35, 75)
     private val rateLimitRepository = MockRateLimitRepository(rate)
-
+    private val error = "Some error"
     private lateinit var presenter: MainPresenter
 
     @Before
@@ -56,7 +62,10 @@ class MainPresenterTest {
     @Test
     fun testOnViewCreatedFlow() {
         presenter.onViewCreated()
-        verify(mockMainActivity).showUsers(userList)
+        verify(mockMainActivity, times(1)).showProgressIndicator(true)
+        verify(mockMainActivity, times(1)).showProgressIndicator(false)
+        verify(mockMainActivity, times(1)).showUsers(userList)
+        verify(mockMainActivity, times(1)).showRate(rate)
     }
 
     @Test
@@ -72,6 +81,24 @@ class MainPresenterTest {
     }
 
     @Test
+    fun testOnRefreshNext() {
+        presenter.onRefresh()
+        verify(mockMainActivity, times(1)).showUsers(userList)
+        presenter.onRefresh()
+        verify(mockMainActivity, times(1)).showUsers(userListNext)
+    }
+
+    @Test
+    fun testOnRefreshWithError() {
+        usersRepository.setError(error)
+        presenter.onRefresh()
+        verify(mockMainActivity, times(1)).showProgressIndicator(true)
+        verify(mockMainActivity, times(1)).showProgressIndicator(false)
+        verify(mockMainActivity, times(0)).showUsers(userList)
+        verify(mockMainActivity, times(1)).showError(error)
+    }
+
+    @Test
     fun testOnItemClick() {
         presenter.onItemClick(clickedUser)
         verify(mockMainActivity).openUserDetail(clickedUser)
@@ -82,9 +109,23 @@ class MainPresenterTest {
         Mockito.verifyNoMoreInteractions(mockMainActivity)
     }
 
-    private class MockUsersRepository(val users: List<User>): UsersRepository{
+    private class MockUsersRepository(val users: List<User>, val usersNext: List<User>): UsersRepository{
+        private var error = ""
+
         override fun getUsers(onUsersCallback: OnUsersCallback, since: String){
-            onUsersCallback.onUsersReady(users)
+            if (error.isNotEmpty()) {
+                onUsersCallback.onUsersError(error)
+            } else {
+                if (users.last().userId.toString() == since){
+                    onUsersCallback.onUsersReady(usersNext)
+                } else {
+                    onUsersCallback.onUsersReady(users)
+                }
+            }
+        }
+
+        fun setError (error: String){
+            this.error = error
         }
     }
 

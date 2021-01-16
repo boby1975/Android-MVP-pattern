@@ -10,6 +10,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import boby.mvp_pattern.App
+import boby.mvp_pattern.Constants.AVATAR_URL_KEY
+import boby.mvp_pattern.Constants.LOGIN_KEY
+import boby.mvp_pattern.Constants.USER_ID_KEY
 import boby.mvp_pattern.R
 import boby.mvp_pattern.contract.MainContract
 import boby.mvp_pattern.data.domainModels.Rate
@@ -81,8 +84,9 @@ class MainActivity: AppCompatActivity(), MainContract.View {
 
     override fun openUserDetail(user: User) {
         val intent = Intent(mContext, UserReposActivity::class.java)
-        intent.putExtra("login", user.login)
-        intent.putExtra("avatarUrl", user.avatarUrl)
+        intent.putExtra(USER_ID_KEY, user.userId)
+        intent.putExtra(LOGIN_KEY, user.login)
+        intent.putExtra(AVATAR_URL_KEY, user.avatarUrl)
         startActivity(intent)
     }
 
@@ -94,7 +98,7 @@ class MainActivity: AppCompatActivity(), MainContract.View {
     }
 
     override fun showError(error: String) {
-        ViewUtils().showSnackBarAttention(error, mainContentLayout, mContext)
+        ViewUtils.showSnackBarAttention(error, mainContentLayout, mContext)
     }
 
     private fun setupRecyclerView(recyclerView: RecyclerView) {

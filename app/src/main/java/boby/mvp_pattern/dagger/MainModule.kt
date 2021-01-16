@@ -2,9 +2,11 @@ package boby.mvp_pattern.dagger
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.room.Room
 import boby.mvp_pattern.BuildConfig
 import boby.mvp_pattern.contract.MainContract
 import boby.mvp_pattern.contract.UserReposContract
+import boby.mvp_pattern.data.dataBase.AppDatabase
 import boby.mvp_pattern.data.network.NetState
 import boby.mvp_pattern.data.network.GithubApi
 import boby.mvp_pattern.data.network.manager.NetworkManager
@@ -71,8 +73,8 @@ class MainModule(private val context: Context) {
 
     @Provides
     @Singleton
-    fun provideReposLocalDataSource(): ReposLocalDataSource {
-        return ReposLocalDataSource()
+    fun provideReposLocalDataSource(appDatabase: AppDatabase): ReposLocalDataSource {
+        return ReposLocalDataSource(appDatabase)
     }
 
     //UsersRepository
@@ -92,8 +94,8 @@ class MainModule(private val context: Context) {
 
     @Provides
     @Singleton
-    fun provideUsersLocalDataSource(sharedPreferences: SharedPreferences): UsersLocalDataSource {
-        return UsersLocalDataSource(sharedPreferences)
+    fun provideUsersLocalDataSource(appDatabase: AppDatabase): UsersLocalDataSource {
+        return UsersLocalDataSource(appDatabase)
     }
 
 
@@ -156,4 +158,11 @@ class MainModule(private val context: Context) {
         return retrofit.create(GithubApi::class.java)
     }
 
+    @Provides
+    @Singleton
+    fun provideAppDatabase(): AppDatabase {
+        return Room.databaseBuilder(context, AppDatabase::class.java, "testDataBase")
+            .fallbackToDestructiveMigration()
+            .build()
+    }
 }

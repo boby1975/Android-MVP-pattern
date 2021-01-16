@@ -1,7 +1,8 @@
 package boby.mvp_pattern.data.domainModels
 
-import com.google.gson.annotations.SerializedName
+import androidx.annotation.Keep
 
+@Keep
 data class Repo(
     var id: Long = 0,
     var name: String = "",

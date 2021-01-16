@@ -9,12 +9,12 @@ class ReposRepository @Inject constructor(
     private val localDataSource: ReposLocalDataSource,
     private val remoteDataSource: ReposRemoteDataSource) {
 
-    fun getRepos(onReposCallback: OnReposCallback, login: String) {
+    fun getRepos(onReposCallback: OnReposCallback, login: String, userId: Int) {
         netState.isConnectedToInternet?.let {
             if (it) {
                 remoteDataSource.getRepos(object: OnReposRemoteCallback {
                     override fun onReposRemoteReady(repos: List<Repo>) {
-                        localDataSource.saveRepos(repos)
+                        localDataSource.saveRepos(repos, userId)
                         onReposCallback.onReposReady(repos)
                     }
 
@@ -27,7 +27,7 @@ class ReposRepository @Inject constructor(
                     override fun onReposLocalReady(repos: List<Repo>) {
                         onReposCallback.onReposReady(repos)
                     }
-                })
+                }, userId)
             }
         }
     }

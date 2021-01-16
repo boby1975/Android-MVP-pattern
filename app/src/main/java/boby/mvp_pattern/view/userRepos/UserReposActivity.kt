@@ -11,6 +11,9 @@ import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import boby.mvp_pattern.App
+import boby.mvp_pattern.Constants.AVATAR_URL_KEY
+import boby.mvp_pattern.Constants.LOGIN_KEY
+import boby.mvp_pattern.Constants.USER_ID_KEY
 import boby.mvp_pattern.R
 import boby.mvp_pattern.contract.UserReposContract
 import boby.mvp_pattern.data.domainModels.Repo
@@ -25,7 +28,8 @@ class UserReposActivity : AppCompatActivity(), UserReposContract.View {
     private lateinit var reposRecyclerView: RecyclerView
     private lateinit var progressBar: ProgressBar
     private lateinit var mContext: Context
-    private var user = ""
+    private var login = ""
+    private var userId = -1
     @Inject
     lateinit var presenter: UserReposContract.Presenter
 
@@ -43,18 +47,19 @@ class UserReposActivity : AppCompatActivity(), UserReposContract.View {
         }
 
         val intent = intent
-        user = intent.getStringExtra("login")?:""
-        val avatarUrl = intent.getStringExtra("avatarUrl")
+        userId = intent.getIntExtra(USER_ID_KEY, -1)
+        login = intent.getStringExtra(LOGIN_KEY)?:""
+        val avatarUrl = intent.getStringExtra(AVATAR_URL_KEY)
         val avatarImageView = findViewById<ImageView>(R.id.avatar_image_view)
         val avatarTextView = findViewById<TextView>(R.id.avatar_text_view)
         val userTextView = findViewById<TextView>(R.id.user_text_view)
-        userTextView.text = user
+        userTextView.text = login
         if (!avatarUrl.isNullOrEmpty()){
             Picasso.get().load(avatarUrl).transform(CircleTransform()).into(avatarImageView)
             avatarTextView.visibility = View.GONE
         } else {
             avatarTextView.visibility = View.VISIBLE
-            avatarTextView.text = user.take(1).toUpperCase()
+            avatarTextView.text = login.take(1).toUpperCase()
         }
 
         progressBar = findViewById(R.id.progressBar)
@@ -62,7 +67,7 @@ class UserReposActivity : AppCompatActivity(), UserReposContract.View {
         setupRecyclerView(reposRecyclerView)
 
         presenter.attachView(this)
-        presenter.onViewCreated(user)
+        presenter.onViewCreated(login, userId)
     }
 
     override fun onDestroy() {
@@ -89,7 +94,7 @@ class UserReposActivity : AppCompatActivity(), UserReposContract.View {
     }
 
     override fun showError(error: String) {
-        ViewUtils().showSnackBarAttention(error, userContentLayout, mContext)
+        ViewUtils.showSnackBarAttention(error, userContentLayout, mContext)
     }
 
     private fun setupRecyclerView(recyclerView: RecyclerView) {

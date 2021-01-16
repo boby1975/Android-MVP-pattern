@@ -1,7 +1,8 @@
 package boby.mvp_pattern.data.domainModels
 
-import com.google.gson.annotations.SerializedName
+import androidx.annotation.Keep
 
+@Keep
 data class User (
     var userId: Int = -1,
     var login: String = "",

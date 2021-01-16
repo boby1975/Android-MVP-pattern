@@ -16,8 +16,8 @@ class UserReposPresenter @Inject constructor(private val reposRepository: ReposR
         Log.d(LOG_TAG, "init")
     }
 
-    override fun onViewCreated(user: String) {
-        loadRepositories(user)
+    override fun onViewCreated(login: String, userId: Int) {
+        loadRepositories(login, userId)
     }
 
     override fun attachView(view: UserReposContract.View) {
@@ -30,7 +30,7 @@ class UserReposPresenter @Inject constructor(private val reposRepository: ReposR
         this.view = null
     }
 
-    private fun loadRepositories(user: String) {
+    private fun loadRepositories(login: String, userId: Int) {
         view?.showProgressIndicator(true)
         reposRepository.getRepos(object: OnReposCallback {
             override fun onReposReady(repos: List<Repo>) {
@@ -43,6 +43,6 @@ class UserReposPresenter @Inject constructor(private val reposRepository: ReposR
                 view?.showProgressIndicator(false)
                 view?.showError(error)
             }
-        }, user)
+        }, login, userId)
     }
 }

@@ -1,15 +1,19 @@
 package boby.mvp_pattern.data.repository.usersRepository
 
-import android.content.SharedPreferences
 import android.os.Handler
+import android.util.Log
+import boby.mvp_pattern.data.dataBase.AppDatabase
+import boby.mvp_pattern.data.dataBase.dbModels.DBUser
 import boby.mvp_pattern.data.domainModels.User
-import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.*
+import org.modelmapper.ModelMapper
 import javax.inject.Inject
 
-class UsersLocalDataSource @Inject constructor(private val sharedPreferences: SharedPreferences) {
+class UsersLocalDataSource @Inject constructor(private val db: AppDatabase) {
+    private val LOG_TAG = this.javaClass.name.split(".").last()
     private val testMode = false
-    private val USERS = "users"
+    private val userDao = db.userDao()
 
     fun getUsers(onUsersLocalCallback: OnUsersLocalCallback) {
         if (testMode) {
@@ -20,18 +24,40 @@ class UsersLocalDataSource @Inject constructor(private val sharedPreferences: Sh
             )
             Handler().postDelayed({ onUsersLocalCallback.onUsersLocalReady(userList) }, 100)
         } else {
-            val jsonUsers = sharedPreferences.getString(USERS, "")
-            val userListType = object : TypeToken<List<User>>(){}.type
-            val users = Gson().fromJson<List<User>>(jsonUsers, userListType) ?: listOf()
-            onUsersLocalCallback.onUsersLocalReady(users)
+            //get users from DB
+            GlobalScope.launch(Dispatchers.Main){
+                var users = listOf<User>()
+                try {
+                    val dbUsers = withContext(Dispatchers.IO) { userDao.getAll() }
+                    val modelMapper = ModelMapper()
+                    val userListType = object : TypeToken<List<User>>(){}.type
+                    users = modelMapper.map(dbUsers, userListType)
+                } catch (exception: Exception) {
+                    Log.w(LOG_TAG, "$exception handled !!!")
+                }
+                onUsersLocalCallback.onUsersLocalReady(users)
+                Log.d(LOG_TAG, "getUsers done")
+            }
         }
     }
 
     fun saveUsers(users: List<User>){
-        //todo save users in DB
-        val editor = sharedPreferences.edit()
-        val jsonUsers = Gson().toJson(users)
-        editor.putString(USERS, jsonUsers)
-        editor.apply()
+        //save users in DB
+        GlobalScope.launch(Dispatchers.Main + handler){
+            for (user in users){
+                val userToSave = DBUser(user.userId, user.login, user.avatarUrl)
+                val dbUser = withContext(Dispatchers.IO) { userDao.getById(user.userId) }
+                if (dbUser == null) {
+                    withContext(Dispatchers.IO) { userDao.insert(userToSave) }
+                } else {
+                    withContext(Dispatchers.IO) { userDao.update(userToSave) }
+                }
+            }
+            Log.d(LOG_TAG, "saveUsers done")
+        }
+    }
+
+    private val handler = CoroutineExceptionHandler { _, exception ->
+        Log.d(LOG_TAG, "$exception handled !")
     }
 }
