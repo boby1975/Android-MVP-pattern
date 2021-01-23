@@ -8,9 +8,10 @@ import boby.mvp_pattern.data.domainModels.User
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.*
 import org.modelmapper.ModelMapper
+import java.lang.reflect.Type
 import javax.inject.Inject
 
-class UsersLocalDataSource @Inject constructor(private val db: AppDatabase) {
+class UsersLocalDataSource @Inject constructor(db: AppDatabase) {
     private val LOG_TAG = this.javaClass.name.split(".").last()
     private val testMode = false
     private val userDao = db.userDao()
@@ -46,12 +47,7 @@ class UsersLocalDataSource @Inject constructor(private val db: AppDatabase) {
         GlobalScope.launch(Dispatchers.Main + handler){
             for (user in users){
                 val userToSave = DBUser(user.userId, user.login, user.avatarUrl)
-                val dbUser = withContext(Dispatchers.IO) { userDao.getById(user.userId) }
-                if (dbUser == null) {
-                    withContext(Dispatchers.IO) { userDao.insert(userToSave) }
-                } else {
-                    withContext(Dispatchers.IO) { userDao.update(userToSave) }
-                }
+                withContext(Dispatchers.IO) { userDao.insert(userToSave) }
             }
             Log.d(LOG_TAG, "saveUsers done")
         }
